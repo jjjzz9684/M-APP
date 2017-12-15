@@ -2,24 +2,18 @@ package com.example.hnsle.m_app;
 
 import android.Manifest;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,20 +26,16 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
-
 public class startClimbing extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
@@ -58,12 +48,15 @@ public class startClimbing extends AppCompatActivity implements OnMapReadyCallba
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LatLng preLatLng;
+    double[] destination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_climbing);
 
+        Intent intent = getIntent();
+        destination = intent.getDoubleArrayExtra("destination");
         startTime = System.currentTimeMillis();
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -171,7 +164,6 @@ public class startClimbing extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public void onLocationChanged(Location location)
     {
-
         if (mLastLocation != null) {
             preLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
         }
@@ -194,14 +186,22 @@ public class startClimbing extends AppCompatActivity implements OnMapReadyCallba
 
         String latitude = Double.toString(location.getLatitude());
         String longitude = Double.toString(location.getLongitude());
-        Toast.makeText(
-                getApplicationContext(), "Latitude :" + latitude +", Longitude :" + longitude, Toast.LENGTH_LONG)
-                .show();
         //move map camera
        // mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,18));
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 latLng, 18));
 
+        //이전 intent에서 읽어온 값을 목적지로 지정함
+        Location loc = new Location("");
+        loc.setLatitude(destination[0]);
+        loc.setLongitude(destination[1]);
+
+        Float distance = location.distanceTo(loc);
+        //Toast.makeText(
+        //        getApplicationContext(), "Latitude :" + latitude +", Longitude :" + longitude + "\ndistance : "+ distance, Toast.LENGTH_LONG)
+        //        .show();
+        TextView textView = (TextView)findViewById(R.id.textView8);
+        textView.setText("정상까지 남은 거리 : " + (distance.intValue())+"m");
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;

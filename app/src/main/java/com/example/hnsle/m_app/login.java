@@ -20,7 +20,9 @@ public class login extends AppCompatActivity {  //로그인 이라기 보단 갈
     }
 
     public void startClimbing(View view) {
+        double[] destination = {37.56, 126.97};
         Intent intent = new Intent(this, startClimbing.class);
+        intent.putExtra("destination",destination);
         startActivity(intent);
     }
 
